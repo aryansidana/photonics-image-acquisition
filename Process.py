@@ -127,6 +127,10 @@ def plot(angles, intensities):
     ax[1].set_ylabel("Intensity2")
     ax[2].set_ylabel("Intensity3")
     
+    plt.xlabel("Angle (°)")
+    
+
+    
     fig.suptitle("Angle vs Intensities")
     plt.show()
 
