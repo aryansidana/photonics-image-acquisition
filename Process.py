@@ -44,12 +44,6 @@ def is_saturated2(img):
     # If number of saturated pixels is greater than zero, then
     # calculate the percentage of the pixels that is saturated, not including background value of 0 saturation
     # We can change this percentage
-
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    saturation = hsv[:, :, 1];
-    saturated_pixels = np.count_nonzero(saturation == 255)
-    zeros = np.count_nonzero(saturation == 0)
-    total_pixels = saturation.size
     
     ## print("max: ", saturation.max())
     ## print("saturation: ", saturation)
@@ -57,6 +51,12 @@ def is_saturated2(img):
     ## print("zeros: ", zeros)
     ## print("total pixels: ", total_pixels)
     ## print(saturated_pixels != 0 and saturated_pixels / (total_pixels - zeros))
+
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    saturation = hsv[:, :, 1];
+    saturated_pixels = np.count_nonzero(saturation == 255)
+    zeros = np.count_nonzero(saturation == 0)
+    total_pixels = saturation.size
     
     return saturated_pixels != 0 and saturated_pixels / (total_pixels - zeros) > 0.1
 
@@ -74,7 +74,6 @@ def calc_intensity1(img):
 # Calculates intensity by averaging all pixels together in gray scale
 # img --> bgr
 def calc_intensity2(img):
-    print("shape: ", img.shape)
     return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY).mean()
 
 # Calculates average intensity, not including background
@@ -88,7 +87,6 @@ def calc_intensity3(img):
     return gray[gray > 0].mean()
 
 
-# Hard one, but calculate intensity using Gaussian curve?
 def calc_intensity4(img):
     pass
 
@@ -199,7 +197,7 @@ def main():
         intensities[3].append(max_intensity(img))
         
 
-
+    
         print("image%d" %(i+1))
         print("saturated1: ", is_saturated1(img))
         print("saturated2: ", is_saturated2(img))
@@ -216,8 +214,14 @@ def main():
 
 main()
 
-path = r"C:/Users/grace/Desktop/SEED NANOTECH/code/sample_laser/img5.jpg"
+path = r"C:/Users/grace/Desktop/SEED NANOTECH/code/sample_laser/img1.jpg"
 img = cv2.imread(path)
+
+show_img(img)
+show_img(cv2.cvtColor(img, cv2.COLOR_BGR2HSV))
+
+plot_row(img)
+
 
 #print(max_intensity(img))
 #path = r"C:/Users/grace/Desktop/SEED NANOTECH/code/saturated_img/green_laser.jpeg"
@@ -230,7 +234,7 @@ img = cv2.imread(path)
 
 
 
-plot_row(img)
+#plot_row(img)
 #plot_3D(img)
 
 #threshold(img)

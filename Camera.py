@@ -30,19 +30,21 @@ class Camera:
         return self.camera.framerate
         
     # Capturing a jpg image
-    def capture_img_jpg(self):
+    def capture_img_jpg(self, angle):
         self.camera.start_preview()
         sleep(2) # Warm up camera
-        self.camera.capture("img%d.jpg" %self.num_img)
-        self.camera.stop_preview()
+        #self.camera.capture("Desktop/'Image Acquisition'/img%d.jpg" %self.num_img)
+        self.camera.capture("Desktop/'Image Acquisition'/img%d.jpg" %angle)
+        #self.camera.stop_preview()
         self.num_img+=1 # update number of captures
         
     # Capturing a png image
-    def capture_img_png(self):
+    def capture_img_png(self, angle):
         self.camera.start_preview()
         sleep(2) # Warm up
-        self.camera.capture("img%d.png" %self.num_img)
-        self.camera.stop_preview()
+        #self.camera.capture("Desktop/'Image Acquisition'/img%d.png" %self.num_img)
+        self.camera.capture("Desktop/'Image Acquisition'/img%d.png" %angle)
+        #self.camera.stop_preview()
         self.num_img+=1 # update number of captures
         
     # Capture to an OpenCV object 
@@ -57,10 +59,10 @@ class Camera:
     # time: length of the video
     def capture_vid(self, time):
         self.camera.start_preview()
-        self.camera.start_recording("vid%d.jpg" %self.num_vid)
+        self.camera.start_recording("Desktop/'Image Acquisition'/vid%d.jpg" %self.num_vid)
         sleep(time)
         self.camera.stop_recording()
-        self.camera.stop_preview()
+        #self.camera.stop_preview()
         self.num_vid+=1
         
 
@@ -76,12 +78,6 @@ def run():
         
 
 run()
-
-
-
-
-
-
 
 
 '''
