@@ -96,8 +96,33 @@ def capture(angle):
 # if boolean == True: shows the plot of image
 # if boolean == False: returns calculated intensity at angle
 def capture(angle,boolean):
-    # Calculate the intensity
-    light_HSL = capture(angle)
+    cam = picamera.PiCamera()
+    cam.resolution = (1920, 1080)
+    cam.exposure_mode = 'off'
+    cam.start_preview()
+
+    #Changed pi dir: saved images test_img folder
+    cam.capture('/home/pi/Desktop/Image_Acquisition/test_img/'+angle+'.png')
+
+    img = cv2.imread('/home/pi/Desktop/Image_Acquisition/test_img/'+angle+'.png')
+
+    if is_saturated(img)==True:
+        print("ERROR: Image is Saturated")
+        return 0;
+    
+    #Can adjust threshold cut off value
+    th, dst = cv2.threshold(img,0,255,cv2.THRESH_TOZERO)
+    
+    imgHLS = cv2.cvtColor(dst, cv2.COLOR_BGR2HLS)
+
+    cam.close()
+    
+    # calculate the intensity
+    intensity = light_HLS(imgHLS)
+    
+    # append calculated values to list
+    intensities.append(intensity)
+    angles.append(angle)
     
     # Plot points
     if boolean:
@@ -108,7 +133,7 @@ def capture(angle,boolean):
         plt.show()
         
     else:
-        return light_HSL
+        return intensity
         
 
 #Clear matplotlib graph in order to plot new angle range
