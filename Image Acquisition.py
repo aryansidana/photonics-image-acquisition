@@ -2,7 +2,15 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import picamera
+import os
 
+
+# global variables
+angles = []
+intensities = []
+
+
+# Check if image is saturated using HSV 
 # img --> BGR
 def is_saturated(img):
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -11,6 +19,7 @@ def is_saturated(img):
     zeros = np.count_nonzero(saturation == 0)
     total_pixels = saturation.size
     
+    # Can change 0.1 (10%) threshold 
     return saturated_pixels != 0 and saturated_pixels / (total_pixels - zeros) > 0.1
 
 
@@ -23,6 +32,7 @@ def light_HLS(img):
     Avg_light=total_light/(pixels-black_p)
 
     return Avg_light
+
 
 #Captures FHD image and returns light intensity
 def capture():
@@ -47,6 +57,8 @@ def capture():
     
     cam.close()
     return light_HLS(imgHLS)
+
+
 #Captures and saves FHD image (with angle as name) and returns light intensity
 def capture(angle):
     cam = picamera.PiCamera
@@ -56,7 +68,7 @@ def capture(angle):
 
     #Might have to change file directory name (Did't check Pi yet)
     cam.capture('Desktop/Image_Acquisition/'+angle+'.png')
-    
+
     img = cv2.imread('Desktop/Image_Acquisition/'+angle+'.png')
 
     if is_saturated(img)==True:
@@ -69,18 +81,88 @@ def capture(angle):
     imgHLS = cv2.cvtColor(dst, cv2.COLOR_BGR2HLS)
 
     cam.close()
-    return light_HLS(imgHLS)
+    
+    # calculate the intensity
+    intensity = light_HLS(imgHLS)
+    
+    # append calculated values to list
+    intensities.append(intensity)
+    angles.append(angle)
+    
+    return intensity
 
 
+# captures image (with angle as name)
+# if boolean == True: shows the plot of image
+# if boolean == False: returns calculated intensity at angle
 def capture(angle,boolean):
-    pass
-
-
+    # Calculate the intensity
+    light_HSL = capture(angle)
+    
+    # Plot points
+    if boolean:
+        plt.title("Intensity vs Angle")
+        plt.xlabel("Angle (°)")
+        plt.ylabel("Intensity")
+        plt.scatter(angles, intensities)
+        plt.show()
+        
+    else:
+        return light_HSL
+        
 
 #Clear matplotlib graph in order to plot new angle range
 def reset():
-    pass
+    # reinitialize global variables
+    angles = []
+    intensities = []
+    
 
+# Calculates the intensity of images in a folder
+# folder (sample_laser) location is in same directory as this code file
+# Plots the calculated intensity
+# check img types --> bgr/gray/hls
+def plot_folder_images():
+    cur_path = os.path.dirname(os.path.realpath(__file__))
+    # Change folder name
+    img_path = os.path.join(cur_path, "sample_laser")
+    
+    intensity_list = []
+    angle_list = []
+
+    for i, img in enumerate(os.listdir(img_path)):
+        path = os.path.join(img_path, img)
+        
+        #assuming camera takes gray images
+        gray = cv2.imread(path, cv2.IMREAD_GRAYSCALE) #--> This reads the image as gray
+       
+        # convert image to HLS
+        bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+        hls = cv2.cvtColor(bgr, cv2.COLOR_BGR2HLS)
+        intensity_list.append(light_HLS(hls))
+        
+        # get angle (assuming only double digit)
+        angle = int(img[:2])
+        angle_list.append(angle)
+        
+    
+    # plot the function
+    plt.title("Intensity vs Angle")
+    plt.xlabel("Angle (°)")
+    plt.ylabel("Intensity")
+    plt.scatter(angle_list, intensity_list)
+    plt.show()
+
+    
+    
+        
+
+
+
+        
+        
+    
+    
 
 
 
