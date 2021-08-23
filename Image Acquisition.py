@@ -119,13 +119,13 @@ def reset():
     
 
 # Calculates the intensity of images in a folder
-# folder (sample_laser) location is in same directory as this code file
+# folder location is in same directory as this code file
 # Plots the calculated intensity
 # check img types --> bgr/gray/hls
-def plot_folder_images():
+def plot_folder_images(folder):
     cur_path = os.path.dirname(os.path.realpath(__file__))
     # Change folder name
-    img_path = os.path.join(cur_path, "sample_laser")
+    img_path = os.path.join(cur_path, folder)
     
     intensity_list = []
     angle_list = []
