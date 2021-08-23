@@ -3,6 +3,7 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
+from PIL import Image
 # from scipy.stats import norm
 
 # To do (in no particular order)
@@ -177,9 +178,28 @@ def threshold(img):
     # draw the contours on the empty image
     cv2.drawContours(img_contours, contours, -1, (0,255,0), 3)
     show_img(img_contours)
+    
 
 
- 
+
+
+#https://publiclab.org/notes/MaggPi/08-09-2018/raspberry-pi-manual-camera-control
+#loc: mean of te distribution
+#scale: standard dev/ spread or width of distribution
+#size: tuple 
+def create_saturated(loc, scale, size):
+    data = np.random.normal(loc, scale, size)
+    
+    return np.array(data ,dtype=np.uint8)
+  
+    
+
+#img2 = create_saturated(255,0.1,(1920, 1080, 3))
+#hsv = cv2.cvtColor(img2, cv2.COLOR_BGR2HSV)
+#show_img(hsv)
+#print(is_saturated2(img2))
+#plot_row(img2)
+
 def main():
 
     cur_path = os.path.dirname(os.path.realpath(__file__))
@@ -212,15 +232,15 @@ def main():
     plot(angles, intensities)
 
 
-main()
+#main()
 
-path = r"C:/Users/grace/Desktop/SEED NANOTECH/code/sample_laser/img1.jpg"
-img = cv2.imread(path)
+#path = r"C:/Users/grace/Desktop/SEED NANOTECH/code/sample_laser/img1.jpg"
+#img = cv2.imread(path)
 
-show_img(img)
-show_img(cv2.cvtColor(img, cv2.COLOR_BGR2HSV))
+#show_img(img)
+#show_img(cv2.cvtColor(img, cv2.COLOR_BGR2HSV))
 
-plot_row(img)
+#plot_row(img)
 
 
 #print(max_intensity(img))
