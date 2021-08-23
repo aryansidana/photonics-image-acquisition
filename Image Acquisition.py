@@ -62,3 +62,10 @@ def capture(angle,boolean)
 
 
 
+#Clear matplotlib graph in order to plot new angle range
+def reset()
+    
+
+
+
+
