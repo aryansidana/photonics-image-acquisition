@@ -38,13 +38,13 @@ def light_HLS(img):
 def capture():
     cam = picamera.PiCamera()
     cam.resolution = (1920, 1080)
-    cam.exposure_mode('off')
+    cam.exposure_mode = 'off'
     cam.start_preview()
     
     #Might have to change file directory name (Did't check Pi yet)
-    cam.capture("Desktop/Image_Acquisition/img.png")
+    cam.capture("/home/pi/Desktop/Image_Acquisition/test_img/img.png")
     
-    img = cv2.imread('Desktop/Image_Acquisition/img.png')
+    img = cv2.imread('/home/pi/Desktop/Image_Acquisition/test_img/img.png')
 
     if is_saturated(img)==True:
         print("ERROR: Image is Saturated")
@@ -63,13 +63,13 @@ def capture():
 def capture(angle):
     cam = picamera.PiCamera()
     cam.resolution = (1920, 1080)
-    cam.exposure_mode('off')
+    cam.exposure_mode = 'off'
     cam.start_preview()
 
-    #Might have to change file directory name (Did't check Pi yet)
-    cam.capture('Desktop/Image_Acquisition/'+angle+'.png')
+    #Changed pi dir: saved images test_img folder
+    cam.capture('/home/pi/Desktop/Image_Acquisition/test_img/'+angle+'.png')
 
-    img = cv2.imread('Desktop/Image_Acquisition/'+angle+'.png')
+    img = cv2.imread('/home/pi/Desktop/Image_Acquisition/test_img/'+angle+'.png')
 
     if is_saturated(img)==True:
         print("ERROR: Image is Saturated")
