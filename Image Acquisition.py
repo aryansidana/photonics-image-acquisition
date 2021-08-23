@@ -36,7 +36,7 @@ def light_HLS(img):
 
 #Captures FHD image and returns light intensity
 def capture():
-    cam = picamera.PiCamera
+    cam = picamera.PiCamera()
     cam.resolution = (1920, 1080)
     cam.exposure_mode('off')
     cam.start_preview()
@@ -61,7 +61,7 @@ def capture():
 
 #Captures and saves FHD image (with angle as name) and returns light intensity
 def capture(angle):
-    cam = picamera.PiCamera
+    cam = picamera.PiCamera()
     cam.resolution = (1920, 1080)
     cam.exposure_mode('off')
     cam.start_preview()
