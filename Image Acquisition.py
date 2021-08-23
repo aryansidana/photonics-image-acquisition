@@ -3,6 +3,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import picamera
 
+# img --> BGR
+def is_Saturated(img):
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    saturation = hsv[:, :, 1];
+    saturated_pixels = np.count_nonzero(saturation == 255)
+    zeros = np.count_nonzero(saturation == 0)
+    total_pixels = saturation.size
+    
+    return saturated_pixels != 0 and saturated_pixels / (total_pixels - zeros) > 0.1
 
 #Calculate light intensity using HLS image formate
 def light_HLS(img):
