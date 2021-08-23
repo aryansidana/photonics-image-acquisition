@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import picamera
 
 # img --> BGR
-def is_Saturated(img):
+def is_saturated(img):
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     saturation = hsv[:, :, 1];
     saturated_pixels = np.count_nonzero(saturation == 255)
@@ -46,7 +46,7 @@ def capture():
 
 #Captures and saves FHD image (with angle as name) and returns light intensity
 def capture(angle):
- `  cam = picamera.PiCamera
+    cam = picamera.PiCamera
     cam.resolution = (1920, 1080)
     cam.exposure_mode('off')
     cam.start_preview()
@@ -66,13 +66,15 @@ def capture(angle):
     return light_HLS(imgHLS)
 
 
-def capture(angle,boolean)
+def capture(angle,boolean):
+    pass
 
 
 
 
 #Clear matplotlib graph in order to plot new angle range
-def reset()
+def reset():
+    pass
     
 
 
