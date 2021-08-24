@@ -5,9 +5,43 @@ import picamera
 import os
 
 
+class Camera():
+    def __init__(self):
+        self.cam = picamera.PiCamera()
+        self.cam.resolution = (1920, 1080)
+        self.cam.exposure_mode = 'off'
+        self.cam.start_preview()
+        
+    def capture(self, directory):
+        self.cam.capture(directory)
+        self.cam.close()
+        
+    def set_framerate(self, rate):
+        self.cam.framerate = rate
+    
+    def set_analog_gain(self, value):
+        self.cam.analog_gain = value
+        
+    def set_digital_gain(self, value):
+        self.cam.digital_gain = value
+        
+    def set_shutter_speed(self, speed):
+        self.cam.shutter_speed = speed
+    
+    def set_camera_iso(self, iso):
+        self.cam.iso = iso
+    
+    
+#-------------------Initialize Variables-------
+    
 # global variables
 angles = []
 intensities = []
+
+# initialize cam object
+cam = Camera()
+
+#----------------------------------------------
 
 
 # Check if image is saturated using HSV 
@@ -35,52 +69,35 @@ def light_HLS(img):
 
 
 #Captures FHD image and returns light intensity
+# OVERWRITES PREVIOUS SAVED IMAGE OF NAME "IMG"!
 def capture():
-    cam = picamera.PiCamera()
-    cam.resolution = (1920, 1080)
-    cam.exposure_mode = 'off'
-    cam.start_preview()
-    
     #Might have to change file directory name (Did't check Pi yet)
     cam.capture("/home/pi/Desktop/Image_Acquisition/test_img/img.png")
-    
     img = cv2.imread('/home/pi/Desktop/Image_Acquisition/test_img/img.png')
 
-    if is_saturated(img)==True:
+    if is_saturated(img):
         print("ERROR: Image is Saturated")
         return 0;
     
     #Can adjust threshold cut off value
     th, dst = cv2.threshold(img,0,255,cv2.THRESH_TOZERO)
-    
     imgHLS = cv2.cvtColor(dst, cv2.COLOR_BGR2HLS)
-    
-    cam.close()
     return light_HLS(imgHLS)
 
 
 #Captures and saves FHD image (with angle as name) and returns light intensity
 def capture(angle):
-    cam = picamera.PiCamera()
-    cam.resolution = (1920, 1080)
-    cam.exposure_mode = 'off'
-    cam.start_preview()
-
     #Changed pi dir: saved images test_img folder
     cam.capture('/home/pi/Desktop/Image_Acquisition/test_img/'+angle+'.png')
-
     img = cv2.imread('/home/pi/Desktop/Image_Acquisition/test_img/'+angle+'.png')
 
-    if is_saturated(img)==True:
+    if is_saturated(img):
         print("ERROR: Image is Saturated")
         return 0;
     
     #Can adjust threshold cut off value
     th, dst = cv2.threshold(img,0,255,cv2.THRESH_TOZERO)
-    
     imgHLS = cv2.cvtColor(dst, cv2.COLOR_BGR2HLS)
-
-    cam.close()
     
     # calculate the intensity
     intensity = light_HLS(imgHLS)
@@ -92,18 +109,21 @@ def capture(angle):
     return intensity
 
 
+def plot_scatter(x, y):
+    plt.title("Intensity vs Angle")
+    plt.xlabel("Angle (°)")
+    plt.ylabel("Intensity")
+    plt.scatter(angles, intensities)
+    plt.show()
+
+
 # captures image (with angle as name)
 # if boolean == True: shows the plot of image
 # if boolean == False: returns calculated intensity at angle
 def capture(angle,boolean):
-    cam = picamera.PiCamera()
-    cam.resolution = (1920, 1080)
-    cam.exposure_mode = 'off'
-    cam.start_preview()
 
     #Changed pi dir: saved images test_img folder
     cam.capture('/home/pi/Desktop/Image_Acquisition/test_img/'+angle+'.png')
-
     img = cv2.imread('/home/pi/Desktop/Image_Acquisition/test_img/'+angle+'.png')
 
     if is_saturated(img)==True:
@@ -112,11 +132,8 @@ def capture(angle,boolean):
     
     #Can adjust threshold cut off value
     th, dst = cv2.threshold(img,0,255,cv2.THRESH_TOZERO)
-    
     imgHLS = cv2.cvtColor(dst, cv2.COLOR_BGR2HLS)
 
-    cam.close()
-    
     # calculate the intensity
     intensity = light_HLS(imgHLS)
     
@@ -126,23 +143,19 @@ def capture(angle,boolean):
     
     # Plot points
     if boolean:
-        plt.title("Intensity vs Angle")
-        plt.xlabel("Angle (°)")
-        plt.ylabel("Intensity")
-        plt.scatter(angles, intensities)
-        plt.show()
+        plot_scatter(angles, intensities)
         
     else:
         return intensity
-        
-
+    
+    
 #Clear matplotlib graph in order to plot new angle range
 def reset():
     # reinitialize global variables
-    angles = []
-    intensities = []
+    del angles[:]
+    del intensities[:]
     
-
+        
 # Calculates the intensity of images in a folder
 # folder location is in same directory as this code file
 # Plots the calculated intensity
@@ -172,15 +185,8 @@ def plot_folder_images(folder):
         
     
     # plot the function
-    plt.title("Intensity vs Angle")
-    plt.xlabel("Angle (°)")
-    plt.ylabel("Intensity")
-    plt.scatter(angle_list, intensity_list)
-    plt.show()
+    plot_scatter(angle_list, intensity_list)
 
-    
-    
-        
 
 
 
