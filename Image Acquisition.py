@@ -72,23 +72,26 @@ def light_HLS(img):
 
 
 #Captures FHD image and returns light intensity
-# OVERWRITES PREVIOUS SAVED IMAGE OF NAME "IMG"!
+#OVERWRITES PREVIOUS SAVED IMAGE OF NAME "IMG"!
 def capture():
-    #Might have to change file directory name (Did't check Pi yet)
+   
     cam.capture("/home/pi/Desktop/Image_Acquisition/test_img/img.png")
     img = cv2.imread('/home/pi/Desktop/Image_Acquisition/test_img/img.png')
 
+    #Checks if image is saturated
     if is_saturated(img):
         print("ERROR: Image is Saturated")
         return 0;
     
     #Can adjust threshold cut off value
     th, dst = cv2.threshold(img,0,255,cv2.THRESH_TOZERO)
+    #BGR -> HLS
     imgHLS = cv2.cvtColor(dst, cv2.COLOR_BGR2HLS)
+    
     return light_HLS(imgHLS)
 
 
-
+#Initialize Plot
 def plot_scatter(x, y):
     plt.title("Intensity vs Angle")
     plt.xlabel("Angle (°)")
@@ -178,7 +181,6 @@ def capture(angle):
     #Changed pi dir: saved images test_img folder
     cam.capture('/home/pi/Desktop/Image_Acquisition/test_img/'+angle+'.png')
     img = cv2.imread('/home/pi/Desktop/Image_Acquisition/test_img/'+angle+'.png')
-
     if is_saturated(img):
         print("ERROR: Image is Saturated")
         return 0;
@@ -197,8 +199,4 @@ def capture(angle):
     return intensity
 '''
         
-    
-    
-
-
 
