@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import picamera
 import os
+from imutils import contours, grab_contours
 
 
 class Camera():
@@ -55,6 +56,56 @@ def is_saturated(img):
     
     # Can change 0.1 (10%) threshold 
     return saturated_pixels != 0 and saturated_pixels / (total_pixels - zeros) > 0.1
+
+
+#------------------NEW EXTRA----------------------------
+
+# Counts the number of saturated clusters in the image
+# I have never tested this on more than one cluster 
+# img --> gray scale
+#https://www.pyimagesearch.com/2016/10/31/detecting-multiple-bright-spots-in-an-image-with-python-and-opencv/
+def group_saturated(img):
+    # Obtain all saturated pixels
+    ret, thresh = cv2.threshold(img.copy(), 254, 255, cv2.THRESH_TOZERO)
+    # Removes noise (small blobs) on image
+    thresh = cv2.erode(thresh, None, iterations=2)
+    thresh = cv2.dilate(thresh, None, iterations=4)
+    
+
+    # Draw contour  
+    # RETR_EXTERNAL: return only extreme outer flags and leave child contours behind 
+    #   Outer contours only
+    # CHAIN_APPROX_SIMPLE: compresses horizontal, vertical, and diagonal segments
+    #   Leaves only their end points
+    contour = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    contour = grab_contours(contour)
+ 
+    count = 0
+    rad = []
+   
+    #Count number of groups
+    for (i, c) in enumerate(contour):
+        (x, y, w, h) = cv2.boundingRect(c)
+        
+        ((cX, cY), radius) = cv2.minEnclosingCircle(c)
+        cv2.circle(img, (int(cX), int(cY)), int(radius),
+    		(0, 0, 255), 3)
+        cv2.putText(img, "#{}".format(i + 1), (x, y - 15),
+    		cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
+        
+        count = i+1
+        rad.append(radius)
+        
+    # return tuple of number of saturated groups, the radius of the enclosing circle
+    return count, rad
+
+# if there is a group of 255 pixels detected and the radius of that is greater than 20
+# then it is a saturated image
+def is_saturated2(img):
+    count, radius = group_saturated(img)
+    return count > 0 and max(radius) > 20
+      
+#------------------------------------------------------------------------------
 
 # Sum of pixel intensity in gray scale
 def sum_intensity(img):
@@ -110,7 +161,7 @@ def capture(angle,boolean=False):
     cam.capture('/home/pi/Desktop/Image_Acquisition/test_img/'+angle+'.png')
     img = cv2.imread('/home/pi/Desktop/Image_Acquisition/test_img/'+angle+'.png')
 
-    if is_saturated(img)==True:
+    if is_saturated(img):
         print("ERROR: Image is Saturated")
         return 0;
     
