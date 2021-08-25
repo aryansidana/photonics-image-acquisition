@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import picamera
 import os
+from imutils import contours, grab_contours
+
 
 
 class Camera():
@@ -88,12 +90,11 @@ def capture():
     return light_HLS(imgHLS)
 
 
-
 def plot_scatter(x, y):
     plt.title("Intensity vs Angle")
     plt.xlabel("Angle (°)")
     plt.ylabel("Intensity")
-    plt.scatter(angles, intensities)
+    plt.scatter(x, y)
     plt.show()
 
 
@@ -107,7 +108,7 @@ def capture(angle,boolean=False):
     cam.capture('/home/pi/Desktop/Image_Acquisition/test_img/'+angle+'.png')
     img = cv2.imread('/home/pi/Desktop/Image_Acquisition/test_img/'+angle+'.png')
 
-    if is_saturated(img)==True:
+    if is_saturated(img):
         print("ERROR: Image is Saturated")
         return 0;
     
@@ -166,11 +167,12 @@ def plot_folder_images(folder):
     
     # plot the function
     plot_scatter(angle_list, intensity_list)
+    
 
 
 
 
-     
+
 
 '''
 #Captures and saves FHD image (with angle as name) and returns light intensity
