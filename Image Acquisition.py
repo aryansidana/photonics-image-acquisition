@@ -42,6 +42,23 @@ intensities = []
 # initialize cam object
 cam = Camera()
 
+#-------------------Main Functions-------------
+'''
+
+Capture() - Captures an image and returns light intensity if image is not saturated
+    *OVERWRITES PREVIOUS SAVED IMAGE OF NAME "IMG" WITH EACH FUNCTION CALL*
+
+Capture(angle, boolean=False) - Captures an image and saves it with angle as name,
+    if boolean == True: shows the plot of intensity Vs Angle
+    if boolean == False: returns calculated intensity at angle
+
+    *if second argument is not passed, it is automatically set to false*
+
+Reset() - Clears all data points on the scatter plot in order to plot new angle range
+
+plot_folder_images(folder) - Calculates  and plots the intensity of images in a folder
+
+'''
 #----------------------------------------------
 
 
@@ -127,15 +144,16 @@ def light_HLS(img):
 def capture():
    
     cam.capture("/home/pi/Desktop/Image_Acquisition/test_img/img.png")
-    img = cv2.imread('/home/pi/Desktop/Image_Acquisition/test_img/img.png')
+    gray = cv2.imread('/home/pi/Desktop/Image_Acquisition/test_img/img.png',0)
 
     #Checks if image is saturated
-    if is_saturated(img):
+    if is_saturated2(gray):
         print("ERROR: Image is Saturated")
         return 0;
-    
+
+    bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
     #Can adjust threshold cut off value
-    th, dst = cv2.threshold(img,0,255,cv2.THRESH_TOZERO)
+    th, dst = cv2.threshold(bgr,0,255,cv2.THRESH_TOZERO)
     #BGR -> HLS
     imgHLS = cv2.cvtColor(dst, cv2.COLOR_BGR2HLS)
     
@@ -159,14 +177,15 @@ def capture(angle,boolean=False):
 
     #Changed pi dir: saved images test_img folder
     cam.capture('/home/pi/Desktop/Image_Acquisition/test_img/'+angle+'.png')
-    img = cv2.imread('/home/pi/Desktop/Image_Acquisition/test_img/'+angle+'.png')
+    gray = cv2.imread('/home/pi/Desktop/Image_Acquisition/test_img/'+angle+'.png',0)
 
-    if is_saturated(img):
+    if is_saturated2(gray):
         print("ERROR: Image is Saturated")
         return 0;
     
+    bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
     #Can adjust threshold cut off value
-    th, dst = cv2.threshold(img,0,255,cv2.THRESH_TOZERO)
+    th, dst = cv2.threshold(bgr,0,255,cv2.THRESH_TOZERO)
     imgHLS = cv2.cvtColor(dst, cv2.COLOR_BGR2HLS)
 
     # calculate the intensity
@@ -249,4 +268,3 @@ def capture(angle):
     
     return intensity
 '''
-        
