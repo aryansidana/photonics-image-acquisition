@@ -39,9 +39,6 @@ class Camera():
     def set_framerate(self, rate):
         self.cam.framerate = rate
     
-    def set_analog_gain(self, value):
-        self.cam.analog_gain = value
-        
     def set_iso(self, iso):
         self.cam.iso = iso
         
@@ -146,9 +143,7 @@ def group_saturated(img_gray):
         ((cX, cY), radius) = cv2.minEnclosingCircle(c)
         cv2.circle(img_gray, (int(cX), int(cY)), int(radius),
     		(0, 0, 255), 3)
-        cv2.putText(img_gray, "#{}".format(i + 1), (x, y - 15),
-    		cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
-        
+   
         count = i+1
         rad.append(radius)
 
