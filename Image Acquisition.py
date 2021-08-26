@@ -58,6 +58,7 @@ Reset() - Clears all data points on the scatter plot in order to plot new angle 
 
 plot_folder_images(folder) - Calculates  and plots the intensity of images in a folder
 
+export_plot(name) - Exports the scatter plot as a png to the saem directory as this pyhton file.
 '''
 #----------------------------------------------
 
