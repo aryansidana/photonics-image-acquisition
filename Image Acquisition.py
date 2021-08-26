@@ -16,6 +16,8 @@ class Camera():
         self.cam.resolution = (1920, 1080)
         self.cam.exposure_mode = 'off'
         self.cam.framerate = 10
+        self.cam.shutter_speed = 0
+        self.cam.iso = 0
         self.cam.start_preview()
     
     def get_framerate(self):
@@ -30,29 +32,27 @@ class Camera():
     def get_shutter_speed(self):
         return self.cam.shutter_speed
     
-    def get_camera_iso(self):
+    def get_iso(self):
         return self.cam.iso
         
-    
+        
     def set_framerate(self, rate):
         self.cam.framerate = rate
     
     def set_analog_gain(self, value):
         self.cam.analog_gain = value
         
-    def set_digital_gain(self, value):
-        self.cam.digital_gain = value
+    def set_iso(self, iso):
+        self.cam.iso = iso
         
     def set_shutter_speed(self, speed):
         self.cam.shutter_speed = speed
-    
-    def set_camera_iso(self, iso):
-        self.cam.iso = iso
+        
         
     def capture(self, directory):
         self.cam.capture(directory)
         self.cam.stop_preview()
-        self.cam.close()
+        
         
         
         
@@ -65,6 +65,18 @@ intensities = []
 
 # initialize cam object
 cam = Camera()
+
+#cam.set_framerate(20)
+#cam.set_shutter_speed(1000)
+#cam.set_iso(2)
+
+
+#print("framerate: ", cam.get_framerate())
+#print("anagalog: ", cam.get_analog_gain())
+#print("digital: ", cam.get_digital_gain())
+#print("shutter speed: ", cam.get_shutter_speed())
+#print("iso: ", cam.get_iso())
+
 
 
 #------------------------Main Functions----------------------------------------
@@ -160,17 +172,25 @@ def sum_intensity(img_bgr):
 
 #Calculate light intensity using HLS image format
 def light_HLS(img):
-    light= img[:,:,1]
+    light = img[:,:,1]
     total_light = np.sum(light)
-    pixels=img.shape[0]*img.shape[1]
-    black_p=np.count_nonzero(light == 0)
-    Avg_light=total_light/(pixels-black_p)
+    pixels = img.shape[0] * img.shape[1]
+    black_p = np.count_nonzero(light == 0)
+    Avg_light = total_light / (pixels - black_p)
 
     return Avg_light
 
 
 #--------------------------------Plotting--------------------------------------
 
+# Shows a plot of x (list of angles) and y (list of intensities) connected through dashes
+def plot_dash(x, y):
+    plt.title("Intensity vs Angle")
+    plt.xlabel("Angle (°)")
+    plt.ylabel("Intensity")
+    plt.plot(x, y, linestyle='--', dashes=(5, 1))
+    plt.show()
+    
 # Shows a scatter plot of x (list of angles) and y (list of intensities)
 def plot_scatter(x, y):
     plt.title("Intensity vs Angle")
@@ -219,65 +239,7 @@ def reset():
     del angles[:]
     del intensities[:]
     
-    
-#--------------------------------Capture--------------------------------------
 
-#Captures FHD image and returns light intensity
-#OVERWRITES PREVIOUS SAVED IMAGE OF NAME "IMG"!
-def capture():
-   
-    cam.capture("/home/pi/Desktop/Image_Acquisition/test_img/img.png")
-    gray = cv2.imread('/home/pi/Desktop/Image_Acquisition/test_img/img.png',0)
-
-    #Checks if image is saturated
-    if is_saturated2(gray):
-        print("ERROR: Image is Saturated")
-        return 0;
-
-    bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
-    #Can adjust threshold cut off value
-    th, dst = cv2.threshold(bgr,0,255,cv2.THRESH_TOZERO)
-    #BGR -> HLS
-    imgHLS = cv2.cvtColor(dst, cv2.COLOR_BGR2HLS)
-    
-    return light_HLS(imgHLS)
-
-
-
-
-# Captures image (with angle as name)
-# If boolean == True: shows the plot of image
-# If second argument is not passed, it is automatically set to False
-# If boolean == False: returns calculated intensity at angle
-def capture(angle,boolean=False):
-
-    #Changed pi dir: saved images test_img folder
-    cam.capture('/home/pi/Desktop/Image_Acquisition/test_img/'+angle+'.png')
-    gray = cv2.imread('/home/pi/Desktop/Image_Acquisition/test_img/'+angle+'.png',0)
-
-    if is_saturated2(gray):
-        print("ERROR: Image is Saturated")
-        return 0;
-    
-    bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
-    #Can adjust threshold cut off value
-    th, dst = cv2.threshold(bgr,0,255,cv2.THRESH_TOZERO)
-    imgHLS = cv2.cvtColor(dst, cv2.COLOR_BGR2HLS)
-
-    # calculate the intensity
-    intensity = light_HLS(imgHLS)
-    
-    # append calculated values to list
-    intensities.append(intensity)
-    angles.append(angle)
-    
-    # Plot points
-    if boolean:
-        plot_scatter(angles, intensities)
-    
-    return intensity
-
-    
 #--------------------------Extras---------------------------------------------
 # img: image to add text
 # text: String to write on image at location x,y
@@ -295,6 +257,81 @@ def add_text(img, text, x, y):
                 lineType)
     return img
 
+    
+    
+#--------------------------------Capture--------------------------------------
+
+#Captures FHD image and returns light intensity
+#OVERWRITES PREVIOUS SAVED IMAGE OF NAME "IMG"!
+def capture():
+    directory = "/home/pi/Desktop/Image_Acquisition/test_img/img.png"
+    cam.capture(directory)
+    gray = cv2.imread(directory + '/img.png',0)
+    
+    #Checks if image is saturated
+    if is_saturated2(gray) and gray.dtype == 'uint8':
+        print("ERROR: Image is Saturated")
+        return 0;
+
+    bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+    #Can adjust threshold cut off value
+    th, dst = cv2.threshold(bgr,0,255,cv2.THRESH_TOZERO)
+    #BGR -> HLS
+    imgHLS = cv2.cvtColor(dst, cv2.COLOR_BGR2HLS)
+    
+    return light_HLS(imgHLS)
+
+'''
+for angle in range(90,95):
+    capture(str(angle))
+
+capture('95', True)
+'''
+
+
+# Captures image (with angle as name)
+# If boolean == True: shows the plot of image
+# If second argument is not passed, it is automatically set to False
+# If boolean == False: returns calculated intensity at angle
+def capture(angle,boolean=False):
+
+    directory = '/home/pi/Desktop/Image_Acquisition/test_img/'
+    cam.capture(directory + angle + '.png')
+    gray = cv2.imread(directory + angle +'.png',0)
+
+    if is_saturated2(gray) and gray.dtype == 'uint8':
+        print("ERROR: Image is Saturated")
+        gray_text = add_text(gray, "SATURATED", 10, 90)
+        return 0;
+    
+    # Add text to image
+    gray_text = add_text(gray, directory, 10, 30)
+    gray_text = add_text(gray, "Angle: " + angle, 10, 60)
+    print("Angle: ", angle)
+    
+    cv2.imwrite('/home/pi/Desktop/Image_Acquisition/text_img/' + angle + '.png', gray_text) 
+    
+
+    bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+    #Can adjust threshold cut off value
+    th, dst = cv2.threshold(bgr,0,255,cv2.THRESH_TOZERO)
+    imgHLS = cv2.cvtColor(dst, cv2.COLOR_BGR2HLS)
+
+    # calculate the intensity
+    intensity = light_HLS(imgHLS)
+    
+    # append calculated values to list
+    intensities.append(intensity)
+    angles.append(angle)
+    
+    # Plot points
+    if boolean:
+        plot_scatter(angles, intensities)
+        plot_dash(angles,intensities)
+    
+    return intensity
+
+    
 
 
 
