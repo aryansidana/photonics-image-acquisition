@@ -53,8 +53,8 @@ class Camera():
         self.cam.capture(directory)
         self.cam.stop_preview()
         
-        
-        
+    def close(self):
+        self.cam.close()
         
         
 #----------------------Initialize Variables------------------------------------
