@@ -169,27 +169,6 @@ def light_HLS(img):
     return Avg_light
 
 
-#Captures FHD image and returns light intensity
-#OVERWRITES PREVIOUS SAVED IMAGE OF NAME "IMG"!
-def capture():
-   
-    cam.capture("/home/pi/Desktop/Image_Acquisition/test_img/img.png")
-    gray = cv2.imread('/home/pi/Desktop/Image_Acquisition/test_img/img.png',0)
-
-    #Checks if image is saturated
-    if is_saturated2(gray):
-        print("ERROR: Image is Saturated")
-        return 0;
-
-    bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
-    #Can adjust threshold cut off value
-    th, dst = cv2.threshold(bgr,0,255,cv2.THRESH_TOZERO)
-    #BGR -> HLS
-    imgHLS = cv2.cvtColor(dst, cv2.COLOR_BGR2HLS)
-    
-    return light_HLS(imgHLS)
-
-
 #--------------------------------Plotting--------------------------------------
 
 # Shows a scatter plot of x (list of angles) and y (list of intensities)
@@ -200,45 +179,6 @@ def plot_scatter(x, y):
     plt.scatter(x, y)
     plt.show()
 
-
-# captures image (with angle as name)
-# if boolean == True: shows the plot of image
-# if second argument is not passed, it is automatically set to false
-# if boolean == False: returns calculated intensity at angle
-def capture(angle,boolean=False):
-
-    #Changed pi dir: saved images test_img folder
-    cam.capture('/home/pi/Desktop/Image_Acquisition/test_img/'+angle+'.png')
-    gray = cv2.imread('/home/pi/Desktop/Image_Acquisition/test_img/'+angle+'.png',0)
-
-    if is_saturated2(gray):
-        print("ERROR: Image is Saturated")
-        return 0;
-    
-    bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
-    #Can adjust threshold cut off value
-    th, dst = cv2.threshold(bgr,0,255,cv2.THRESH_TOZERO)
-    imgHLS = cv2.cvtColor(dst, cv2.COLOR_BGR2HLS)
-
-    # calculate the intensity
-    intensity = light_HLS(imgHLS)
-    
-    # append calculated values to list
-    intensities.append(intensity)
-    angles.append(angle)
-    
-    # Plot points
-    if boolean:
-        plot_scatter(angles, intensities)
-    
-    return intensity
-    
-    
-#Clear matplotlib graph in order to plot new angle range
-def reset():
-    # reinitialize global variables
-    del angles[:]
-    del intensities[:]
 
         
 # Calculates the intensity of images in a folder
@@ -278,7 +218,6 @@ def reset():
     # reinitialize global variables
     del angles[:]
     del intensities[:]
-    
     
     
 #--------------------------------Capture--------------------------------------
