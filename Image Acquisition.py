@@ -200,7 +200,6 @@ def plot_scatter(x, y):
     plt.scatter(x, y)
     plt.show()
 
-
         
 # Calculates the intensity of images in a folder
 # folder location is in same directory as this code file
@@ -233,7 +232,12 @@ def plot_folder_images(folder):
     # plot the function
     plot_scatter(angle_list, intensity_list)
     
-    
+
+#Exports the scatter plot as a png
+def export_plot(name):
+    plt.savefig(name+'.png',format='png')
+
+     
 #Clear matplotlib graph in order to plot new angle range
 def reset():
     # reinitialize global variables
