@@ -278,6 +278,23 @@ def capture(angle,boolean=False):
     return intensity
 
     
-    
+#--------------------------Extras---------------------------------------------
+# img: image to add text
+# text: String to write on image at location x,y
+def add_text(img, text, x, y):
+    location = (x,y)
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    fontScale = .7
+    fontColor = (255, 0, 0)
+    lineType = 2
+    cv2.putText(img, text, 
+                location, 
+                font,
+                fontScale,
+                fontColor,
+                lineType)
+    return img
+
+
 
 
