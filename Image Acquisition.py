@@ -74,6 +74,10 @@ cam = Camera()
 #print("shutter speed: ", cam.get_shutter_speed())
 #print("iso: ", cam.get_iso())
 
+def show_img(img):
+    cv2.imshow("img", img)
+    cv2.waitKey(0) 
+    cv2.destroyAllWindows()
 
 
 #------------------------Main Functions----------------------------------------
@@ -131,21 +135,27 @@ def group_saturated(img_gray):
     #   Outer contours only
     # CHAIN_APPROX_SIMPLE: compresses horizontal, vertical, and diagonal segments
     #   Leaves only their end points
-    contour = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    contour = grab_contours(contour)
+    #  Contours is a Python list of all the contours in the image. 
+    # Each individual contour is a Numpy array of (x,y) coordinates of boundary points of the object.
+    contours = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    contours = grab_contours(contours)
  
     count = 0
     rad = []
    
-    for (i, c) in enumerate(contour):
-        (x, y, w, h) = cv2.boundingRect(c)
+    for i, cnt in enumerate(contours):
+        # It is a circle which completely covers the object with minimum area.
+        # returns the center of the circle and the radius
+        (x, y), radius = cv2.minEnclosingCircle(cnt)
         
-        ((cX, cY), radius) = cv2.minEnclosingCircle(c)
-        cv2.circle(img_gray, (int(cX), int(cY)), int(radius),
+        # img, center coordinates, radius, colour of the border line, thickness
+        cv2.circle(img_gray, (int(x), int(y)), int(radius),
     		(0, 0, 255), 3)
    
         count = i+1
         rad.append(radius)
+    
+    show_img(img_gray)
 
     return count, rad
 
@@ -332,4 +342,23 @@ def capture(angle,boolean=False):
     return intensity
 
     
+def main():
+    
+    directory = '/home/pi/Desktop/Image_Acquisition/sample_laser/45.jpg'
+    gray = cv2.imread(directory, cv2.IMREAD_GRAYSCALE)
+    
+    print("test capture:")
+    #for angle in range(90,95):
+    #    capture(str(angle))
+    #capture('95', True)
+    
+    print("Show group saturated images")
+    #show_img(gray)
+    #group_saturated(gray)
+    
+    print("sample laser images plot:")
+    plot_folder_images("sample_laser")
+    print('test img images plot:')
+    plot_folder_images("test_img")
 
+main()
