@@ -222,10 +222,6 @@ def plot_folder_images(folder_name):
     for i, img in enumerate(os.listdir(img_path)):
         path = os.path.join(img_path, img)
         
-        #assuming camera takes gray images
-        #gray = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
-        
-        #assuming camera takes bgr images
         gray = cv2.imread(path, 0)
        
         # check if image is saturated
@@ -234,10 +230,11 @@ def plot_folder_images(folder_name):
             bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
             hls = cv2.cvtColor(bgr, cv2.COLOR_BGR2HLS)
             intensity_list.append(light_HLS(hls))
-            
             # get angle (assuming only double digit)
             angle = int(img[:2])
             angle_list.append(angle)
+        else:
+            print(img + " is saturated")
         
     
     # plot the function
