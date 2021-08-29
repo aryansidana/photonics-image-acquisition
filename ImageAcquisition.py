@@ -48,7 +48,7 @@ class Camera():
         
     def capture(self, directory):
         self.cam.capture(directory)
-        self.cam.stop_preview()
+        #self.cam.stop_preview()
         
     def close(self):
         self.cam.close()
@@ -104,18 +104,18 @@ export_plot(name) - Exports the scatter plot as a png to the same directory as t
 
 
 # Determines percentage of saturated pixels
-# If the number of saturated pixels makes up 10% of the image, 
+# If the number of saturated pixels makes up 95% of the image, 
 # not including the background, then the image is saturated   
 # Returns a boolean, True, if image is saturated. Otherwise, return False
-def is_saturated1(img_bgr):
+def percent_saturated(img_bgr):
     hsv = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2HSV)
     saturation = hsv[:, :, 1];
     saturated_pixels = np.count_nonzero(saturation == 255)
     zeros = np.count_nonzero(saturation == 0)
     total_pixels = saturation.size
     
-    # Can change 0.1 (10%) threshold 
-    return saturated_pixels != 0 and saturated_pixels / (total_pixels - zeros) > 0.1
+    # Can change 0.95 (95%) threshold 
+    return saturated_pixels != 0 and saturated_pixels / (total_pixels - zeros) > 0.95
 
 
 
@@ -164,8 +164,9 @@ def group_saturated(img_gray):
 # then it is a saturated image
 # Returns a boolean, True, if image is saturated. Otherwise, return False
 def is_saturated2(img_gray):
+    bgr = cv2.cvtColor(img_gray, cv2.COLOR_GRAY2BGR)
     count, radius = group_saturated(img_gray)
-    return count > 0 and max(radius) > 20
+    return count > 0 and max(radius) > 90 and percent_saturated(bgr)
 
 
 
@@ -248,6 +249,7 @@ def reset():
     # reinitialize global variables
     del angles[:]
     del intensities[:]
+    cam.close()
     
 
 #--------------------------Extras---------------------------------------------
@@ -291,12 +293,7 @@ def capture():
     
     return light_HLS(imgHLS)
 
-'''
-for angle in range(90,95):
-    capture(str(angle))
 
-capture('95', True)
-'''
 
 
 # Captures image (with angle as name)
