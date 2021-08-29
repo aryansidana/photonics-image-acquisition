@@ -226,12 +226,12 @@ def plot_folder_images(folder_name):
         #gray = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
         
         #assuming camera takes bgr images
-        bgr = cv2.imread(path)
+        gray = cv2.imread(path, 0)
        
         # check if image is saturated
-        if not is_saturated2(bgr):
+        if not is_saturated2(gray):
             # convert image to HLS
-            #bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+            bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
             hls = cv2.cvtColor(bgr, cv2.COLOR_BGR2HLS)
             intensity_list.append(light_HLS(hls))
             
