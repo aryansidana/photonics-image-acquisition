@@ -211,10 +211,10 @@ def plot_scatter(x, y):
 # folder location is in same directory as this code file
 # Plots the calculated intensity
 # check img types --> bgr/gray/hls
-def plot_folder_images(folder):
+def plot_folder_images(folder_name):
     cur_path = os.path.dirname(os.path.realpath(__file__))
     # Change folder name
-    img_path = os.path.join(cur_path, folder)
+    img_path = os.path.join(cur_path, folder_name)
     
     intensity_list = []
     angle_list = []
@@ -223,16 +223,21 @@ def plot_folder_images(folder):
         path = os.path.join(img_path, img)
         
         #assuming camera takes gray images
-        gray = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
-       
-        # convert image to HLS
-        bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
-        hls = cv2.cvtColor(bgr, cv2.COLOR_BGR2HLS)
-        intensity_list.append(light_HLS(hls))
+        #gray = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
         
-        # get angle (assuming only double digit)
-        angle = int(img[:2])
-        angle_list.append(angle)
+        #assuming camera takes bgr images
+        bgr = cv2.imread(path)
+       
+        # check if image is saturated
+        if not is_saturated2(bgr):
+            # convert image to HLS
+            #bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+            hls = cv2.cvtColor(bgr, cv2.COLOR_BGR2HLS)
+            intensity_list.append(light_HLS(hls))
+            
+            # get angle (assuming only double digit)
+            angle = int(img[:2])
+            angle_list.append(angle)
         
     
     # plot the function
@@ -292,7 +297,6 @@ def capture():
     imgHLS = cv2.cvtColor(dst, cv2.COLOR_BGR2HLS)
     
     return light_HLS(imgHLS)
-
 
 
 
