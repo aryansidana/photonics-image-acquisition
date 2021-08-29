@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import picamera
 import os
-from imutils import contours, grab_contours
+from imutils import grab_contours
 
 #------------------------------Camera Class-----------------------------------
 
