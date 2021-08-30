@@ -185,9 +185,12 @@ def activate_clicked():
         motorActivated = True
 
 def capture_clicked():
+    switchButtonState(capture_btn)
     global cap = True
+    
 
 def export_clicked():
+    switchButtonState(export_btn)
     global export = True
     
 def runforw_clicked():
@@ -204,6 +207,8 @@ def runforw_clicked():
     switchButtonState(reset_btn)
     switchButtonState(enter_btn)
     switchButtonState(activate_btn)
+    switchButtonState(capture_btn)
+    switchButtonState(export_btn)
     set_speed(lib,device_id, speed)
     num = begin
     while num < rotate or num == rotate : 
