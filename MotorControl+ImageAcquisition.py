@@ -20,6 +20,8 @@ global microstep_deg
 global motorActivated
 global step_size
 motorActivated= True
+global cap = False
+global export = False
 
 countsPerRev = 200 
 degPerRev = 1.8
@@ -182,6 +184,12 @@ def activate_clicked():
         print("Stepper Motor is on")
         motorActivated = True
 
+def capture_clicked():
+    global cap = True
+
+def export_clicked():
+    global export = True
+    
 def runforw_clicked():
     global device_id
     global degPerRev
@@ -205,12 +213,12 @@ def runforw_clicked():
         get_position(lib, device_id)
         num += step_size
         #Capture Image
-        capture(num,True)
+        if cap:
+            capture(num,True)
         
     #Save plot as png
-    export_plot(num+'° to '+rotate+'° Plot')
-    #Clear plot
-    reset()
+    if export:
+        export_plot(num+'° to '+rotate+'° Plot')
     switchButtonState(runforw_btn)
     switchButtonState(reset_btn)
     switchButtonState(enter_btn)
@@ -220,6 +228,9 @@ def reset_clicked():
     global device_id
     homezero (lib, device_id)
     get_position(lib, device_id)
+    global export == False
+    global cap == False
+    reset()
     
 
 #BUTTONS FOR MOTOR ACTIVATION
@@ -232,6 +243,12 @@ runforw_btn.pack(side = "top")
 
 reset_btn = Button(frame2, text = "Reset", font=("Helvetica 10"), command = reset_clicked, state=NORMAL)
 reset_btn.pack(side = "top")
+
+capture_btn = Button(frame2, text = "Capture Image", font=("Helvetica 10"), command = capture_clicked, state=NORMAL)
+capture_btn.pack(side = "top")
+
+export_btn = Button(frame2, text = "Export Plot", font=("Helvetica 10"), command = export_clicked, state=NORMAL)
+export_btn.pack(side = "top")
 
 
 #BUTTONS FOR ROTATION
