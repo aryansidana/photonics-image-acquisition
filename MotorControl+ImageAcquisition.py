@@ -22,6 +22,7 @@ global step_size
 motorActivated= True
 global cap = False
 global export = False
+global folder
 
 countsPerRev = 200 
 degPerRev = 1.8
@@ -236,7 +237,12 @@ def reset_clicked():
     global export == False
     global cap == False
     reset()
-    
+
+def folder_clicked():
+    global folder = str(folder_entry.get())
+    plot_folder_images(folder)
+    if export:
+        export_plot(num+'° to '+rotate+'° Plot')
 
 #BUTTONS FOR MOTOR ACTIVATION
 
@@ -255,6 +261,9 @@ capture_btn.pack(side = "top")
 export_btn = Button(frame2, text = "Export Plot", font=("Helvetica 10"), command = export_clicked, state=NORMAL)
 export_btn.pack(side = "top")
 
+folder_btn = Button(frame2, text = "Plot Images From Folder", font=("Helvetica 10"), command = folder_clicked, state=NORMAL)
+folder_btn.pack(side = "top")
+
 
 #BUTTONS FOR ROTATION
 speed_frame = LabelFrame (frame3, text = "Speed")
@@ -269,6 +278,9 @@ rotate_frame.pack(fill="both")
 step_frame = LabelFrame (frame3, text = "Step Size (Degrees)")
 step_frame.pack(fill="both")
 
+folder_frame = LabelFrame (frame3, text = "Folder Name")
+folder_frame.pack(fill="both")
+
 speed_entry = Entry(speed_frame)
 speed_entry.pack(fill="both", expand = "yes", side = "left",padx = 10, pady = 10)
 
@@ -280,6 +292,9 @@ rotate_entry.pack(fill="both", expand = "yes", side = "left",padx = 10, pady = 1
 
 step_entry = Entry(step_frame)
 step_entry.pack(fill="both", expand = "yes", side = "left",padx = 10, pady = 10)
+
+folder_entry = Entry(folder_frame)
+folder_entry.pack(fill="both", expand = "yes", side = "left",padx = 10, pady = 10)
 
 #ROTATION/MICROSTEP BUTTON COMMAND BINDERS
 def get_info():
