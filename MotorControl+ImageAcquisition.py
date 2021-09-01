@@ -19,6 +19,7 @@ global microsteps
 global microstep_deg
 global motorActivated
 global step_size
+global open_name
 motorActivated= True
 global cap = False
 global export = False
@@ -103,7 +104,7 @@ if not open_name:
 
 if type(open_name) is str:
     open_name = open_name.encode()
-
+   
 print("\nOpen device " + repr(open_name))
 device_id = lib.open_device(open_name)
 print("Device id: " + repr(device_id))
@@ -112,16 +113,15 @@ print("Device id: " + repr(device_id))
 #ROTATION/CONTROL FUNCTION
 def move(lib, device_id, distance, udistance):
     lib.command_move(device_id, distance, udistance)
-
-def homezero (lib, device_id):
-    lib.command_homezero(device_id)
     
+def homezero (lib, device_id):
+    lib.command_home(device_id)
+    
+def close_device(lib, device_id):
+    lib.close_device(byref(cast(device_id, POINTER(c_int))))
 
-def close(lib, device_id):
-    lib.close_device(device_id)
-
-def open(lib,device_id):
-    lib.open_device(device_id)
+def open_device(lib,open_name):
+    lib.open_device(open_name)
 
 def set_speed(lib, device_id, speed):
     mvst = move_settings_t()
@@ -169,16 +169,17 @@ frame4.pack(fill="both", expand="yes")
 def activate_clicked():
     global motorActivated
     global device_id
+    global open_name
     if motorActivated:
         lib.command_sstp(device_id)
-        close(lib, device_id)
+        close_device(lib, device_id)
         switchButtonState(runforw_btn)
         switchButtonState(reset_btn)
         switchButtonState(enter_btn)
         print("Stepper Motor is off")
         motorActivated = False
     else:
-        open(lib, device_id)
+        open_device(lib, open_name)
         switchButtonState(runforw_btn)
         switchButtonState(reset_btn)
         switchButtonState(enter_btn)
@@ -193,6 +194,7 @@ def capture_clicked():
 def export_clicked():
     switchButtonState(export_btn)
     global export = True
+
     
 def runforw_clicked():
     global device_id
@@ -204,27 +206,25 @@ def runforw_clicked():
     global microsteps
     global microstep_deg
     global step_size
-    switchButtonState(runforw_btn)
-    switchButtonState(reset_btn)
-    switchButtonState(enter_btn)
-    switchButtonState(activate_btn)
-    switchButtonState(capture_btn)
-    switchButtonState(export_btn)
     set_speed(lib,device_id, speed)
     num = begin
+    
+
     while num < rotate or num == rotate : 
         position = round(num*(countsPerRev/degPerRev))
+        #print (position)
+        #print (num)
         time.sleep(3)
         move(lib, device_id, position, microsteps)
         get_position(lib, device_id)
         num += step_size
-        #Capture Image
         if cap:
             capture(num,True)
-        
-    #Save plot as png
+      
     if export:
-        export_plot(num+'° to '+rotate+'° Plot')
+        export_plot(num+'° to '+rotate+'° Plot') 
+    move(lib, device_id, 0, 0)
+    get_position(lib, device_id)
     switchButtonState(runforw_btn)
     switchButtonState(reset_btn)
     switchButtonState(enter_btn)
@@ -232,18 +232,24 @@ def runforw_clicked():
     
 def reset_clicked():
     global device_id
-    homezero (lib, device_id)
+    homezero(lib, device_id)
     get_position(lib, device_id)
     global export == False
     global cap == False
     reset()
+    switchButtonState(capture_btn)
+    switchButtonState(export_btn)
+    switchButtonState(runforw_btn)
+    switchButtonState(reset_btn)
+    switchButtonState(enter_btn)
+    switchButtonState(activate_btn)
 
 def folder_clicked():
     global folder = str(folder_entry.get())
     plot_folder_images(folder)
     if export:
-        export_plot(num+'° to '+rotate+'° Plot')
-
+        export_plot(num+'° to '+rotate+'° Plot')  
+    
 #BUTTONS FOR MOTOR ACTIVATION
 
 activate_btn = Button(frame2, text = "Activate", font=("Helvetica 10"), command= activate_clicked, state=NORMAL)
@@ -278,7 +284,7 @@ rotate_frame.pack(fill="both")
 step_frame = LabelFrame (frame3, text = "Step Size (Degrees)")
 step_frame.pack(fill="both")
 
-folder_frame = LabelFrame (frame3, text = "Folder Name")
+folder_frame = LabelFrame (frame3, text = " Extra Feature: Folder Name")
 folder_frame.pack(fill="both")
 
 speed_entry = Entry(speed_frame)
@@ -296,6 +302,7 @@ step_entry.pack(fill="both", expand = "yes", side = "left",padx = 10, pady = 10)
 folder_entry = Entry(folder_frame)
 folder_entry.pack(fill="both", expand = "yes", side = "left",padx = 10, pady = 10)
 
+
 #ROTATION/MICROSTEP BUTTON COMMAND BINDERS
 def get_info():
     global speed
@@ -308,7 +315,7 @@ def get_info():
     microsteps = int(microsteps_listbox.get(ANCHOR))
     global step_size
     step_size = float(step_entry.get())
-    
+        
 #BUTTONS FOR MICROSTEPS
 microstep_frame = LabelFrame (frame4, text = "Options")
 microstep_frame.pack(side = "left",padx = 15, pady = 15)
