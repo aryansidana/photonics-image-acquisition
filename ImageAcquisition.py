@@ -230,9 +230,16 @@ def plot_folder_images(folder_name):
             bgr = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
             hls = cv2.cvtColor(bgr, cv2.COLOR_BGR2HLS)
             intensity_list.append(light_HLS(hls))
-            # get angle (assuming only double digit)
-            angle = int(img[:2])
+           
+            angle = []
+            
+            for letter in img:
+                if letter.isdigit():
+                    angle.append(letter)
+           
+            angle = "".join(angle)
             angle_list.append(angle)
+            
         else:
             print(img + " is saturated")
         
