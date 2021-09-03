@@ -238,7 +238,7 @@ def plot_folder_images(folder_name):
                     angle.append(letter)
            
             angle = "".join(angle)
-            angle_list.append(angle)
+            angle_list.append(int(angle))
             
         else:
             print(img + " is saturated")
