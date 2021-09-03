@@ -21,8 +21,8 @@ global motorActivated
 global step_size
 global open_name
 motorActivated= True
-global cap = False
-global export = False
+cap = False
+export = False
 global folder
 
 countsPerRev = 200 
@@ -188,12 +188,12 @@ def activate_clicked():
 
 def capture_clicked():
     switchButtonState(capture_btn)
-    global cap = True
+    cap = True
     
 
 def export_clicked():
     switchButtonState(export_btn)
-    global export = True
+   export = True
 
     
 def runforw_clicked():
@@ -234,8 +234,8 @@ def reset_clicked():
     global device_id
     homezero(lib, device_id)
     get_position(lib, device_id)
-    global export == False
-    global cap == False
+    export == False
+    cap == False
     reset()
     switchButtonState(capture_btn)
     switchButtonState(export_btn)
@@ -245,7 +245,7 @@ def reset_clicked():
     switchButtonState(activate_btn)
 
 def folder_clicked():
-    global folder = str(folder_entry.get())
+    folder = str(folder_entry.get())
     plot_folder_images(folder)
     if export:
         export_plot(num+'° to '+rotate+'° Plot')  
